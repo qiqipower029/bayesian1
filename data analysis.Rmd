@@ -1,0 +1,80 @@
+---
+title: "Data analysis example"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+suppose we are giving 2 studens a multiple-choice exam with 40 questions, where each question has 4 choices. We dont know how much the students have studied for this exam, but we think that they will do better than just guessing randomly.
+
+1) what are the parameters of interest?
+
+solution: theta1 = true probability the first student will answer a question correctly, and theta2 = true probability the second student will answer a question correctly.
+
+2) what is our likelihood?
+
+solution: Binomial (40, theta), if we assume that each question is independent and that the probability a student gets each question right is the same for all questions for that student.
+
+3) what prior should we use?
+
+solution: the conjugate prior is a beta prior. Plot the density with dbeta.
+```{r}
+theta = seq(from=0, to=1, by=.01)
+plot(theta, dbeta(theta, 1, 1), type = "l")
+plot(theta, dbeta(theta, 4, 2), type = "l")
+plot(theta, dbeta(theta, 8, 4), type = "l")
+plot(theta, dbeta(theta, 2, 4), type = "l")
+```
+
+4) what is the prior probability P(theta > 0.25)? P(theta > 0.5)? P(theta > 0.8)?
+```{r}
+1 - pbeta(0.25, 8, 4)
+1 - pbeta(0.5, 8, 4)
+1 - pbeta(0.8, 8, 4)
+```
+
+5) suppose the first student gets 33 questions right. What is the posterior distribution for theta1? P(theta > 0.25)? P(theta > 0.5)? P(theta > 0.8)? what is a 95% posterior credible interval for theta1?
+
+solution: Posterior is Beta (8+33, 4+40-33) = Beta(41, 11)
+```{r}
+# posterior mean
+41/(41+11)
+# MLE
+33/40
+
+# Plot posterior
+plot(theta, dbeta(theta, 41, 11), type = "l")
+
+# plot likelihood
+plot(theta, dbinom(33, size = 40, p = theta))
+
+# posterior probabilities
+1 - pbeta(0.25, 41, 11)
+1 - pbeta(0.8, 41, 11)
+1 - pbeta(0.5, 41, 11)
+
+# equal-tailed credible interval
+qbeta(0.025, 41, 11)
+qbeta(0.975, 41, 11)
+```
+
+6) suppose the second student gets 24 questions right. What is the posterior distribution for theta2? P(theta > 0.25)? P(theta > 0.5)? P(theta > 0.8)? what is a 95% posterior credible interval for theta2?
+
+solution:
+
+7) what is the posterior probability that theta1 > theta2, i.e., that the first student has a better chance of getting a question right than the second student?
+
+solution:
+Estimate by simulation: draw 1000 samples from each and see how often we observe theta1 > theta2
+```{r}
+theta1 = rbeta(1000, 41, 11)
+theta2 = rbeta(1000, 32, 20)
+mean(theta1 > theta2)
+```
+
+```{r}
+plot(theta, dbeta(theta, 5, 1))
+```
+
